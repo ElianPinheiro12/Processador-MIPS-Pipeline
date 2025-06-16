@@ -16,7 +16,7 @@ O pipeline é dividido em 5 estágios clássicos:
 
 ```bash
 MIPS_Pipeline/
-├── src/                    # Códigos-fonte em Verilog
+├── Verilog/                    # Códigos-fonte em Verilog
 │   ├── pc.v                # Program Counter (PC)
 │   ├── if_stage.v          # Estágio de busca (IF)
 │   ├── id_stage.v          # Estágio de decodificação (ID)

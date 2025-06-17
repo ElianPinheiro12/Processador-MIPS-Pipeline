@@ -3,7 +3,7 @@ module shift_left_2 (
     output wire [31:0] out    // Saída deslocada
 );
 
-    // Desloca os bits da entrada 2 posições para a esquerda
+    // Desloca os bits da entrada 2 posições para a esquerdam
     assign out = in << 2;
 
 endmodule

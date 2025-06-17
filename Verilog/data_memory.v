@@ -1,6 +1,3 @@
-//===========================//
-// Bloco: Memória de Dados   //
-//===========================//
 module data_memory (
     input wire clk,                   // Clock para escrita
     input wire MemWrite,             // Habilita escrita

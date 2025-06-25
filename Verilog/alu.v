@@ -1,28 +1,29 @@
-// Arquivo: alu.v
-// Descrição: Unidade Lógica e Aritmética simples
-
 module alu(
-    input  [31:0] a,
-    input  [31:0] b,
-    input  [3:0]  alu_control, // Sinal que define a operação
-    output reg [31:0] result,
-    output zero
-);
+	input wire [31:0] a,
+	input wire [31:0] b,
+	input wire [3:0 ] op,
+	output reg [31:0] c
+); 
+	parameter OP_AND = 4'b0000;
+	parameter OP_OR  = 4'b0001;
+	parameter OP_ADD = 4'b0010;
+	parameter OP_SUB = 4'b0110;
+	parameter OP_SLT = 4'b0111;
+	parameter OP_NOR = 4'b1100;
 
-    // Parâmetros para deixar o código mais legível
-    parameter OP_ADD = 4'b0010;
-    parameter OP_SUB = 4'b0110;
+	always@(*)begin 
+		case(op) 
+		OP_AND: c = a & b;
+		OP_OR:  c = a | b;
+		OP_ADD: c= a + b;
+		OP_SUB: c = a - b;
+		OP_SLT: c = (a < b) ? 32'b1 : 32'b0;
+		OP_NOR: c = ~(a | b);
+		default: c = 32'b0;
 
-    // Lógica combinacional para calcular o resultado
-    always @(*) begin
-        case (alu_control)
-            OP_ADD: result = a + b;
-            OP_SUB: result = a - b;
-            default: result = 32'hxxxxxxxx; // 'x' para indicar um resultado indefinido
-        endcase
-    end
+		
+		endcase
+	end
 
-    // O flag 'zero' é 1 se o resultado da operação for 0
-    assign zero = (result == 32'b0);
 
 endmodule

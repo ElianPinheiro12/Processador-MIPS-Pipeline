@@ -1,11 +1,13 @@
 module top(
-  input clk,
-  input rst,
+	input clk,
+	input rst,
 	input rst_rf,
-  input en,
+	input en,
 	input en_rf,
 	input selec_mux,
-  input selec_mux2,
+	input selec_mux2,
+	input [3:0 ] alu_op,
+	
 	output [31:0] fim
     
 );
@@ -66,7 +68,7 @@ register_file reg_file(
 alu alu_inst(
 	.a(rd1_w),
 	.b(rfb),
-	.op(),
+	.op(alu_op),
 	.c(c_w)
 
 );
@@ -75,7 +77,7 @@ sinal_ex sinal_ex_inst(
 	.b(sin_ex_w)
 );
 
-assign rW_w = selec_mux ? rd_w : rt_w;
+assign rW_w = selec_mux ? rd_w : rs_w;
 assign rfb = selec_mux2 ? sin_ex_w: rd2_w;
 assign fim = c_w;
 

@@ -29,3 +29,4 @@ MIPS_Pipeline/
 ├── testbench/             # Testbenches para simulação
 ├── docs/                  # Documentação e diagramas
 └── README.md              # Este arquivo
+![Captura de tela 2025-06-28 173436](https://github.com/user-attachments/assets/317d0153-0e60-493b-91ea-48b48659cdab)

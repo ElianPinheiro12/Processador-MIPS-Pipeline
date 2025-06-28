@@ -11,6 +11,8 @@ O pipeline é dividido em 5 estágios clássicos:
 3. **EX** (Execute) - Execução de operações aritméticas/lógicas e cálculo de endereços
 4. **MEM** (Memory Access) - Acesso à memória de dados
 5. **WB** (Write Back) - Escrita do resultado nos registradores
+   ![Captura de tela 2025-06-28 173436](https://github.com/user-attachments/assets/27fb799c-2f66-4143-9f14-902f9f91820c)
+
 
 ## 📁 Estrutura do Projeto
 
@@ -29,4 +31,3 @@ MIPS_Pipeline/
 ├── testbench/             # Testbenches para simulação
 ├── docs/                  # Documentação e diagramas
 └── README.md              # Este arquivo
-![Captura de tela 2025-06-28 173436](https://github.com/user-attachments/assets/317d0153-0e60-493b-91ea-48b48659cdab)

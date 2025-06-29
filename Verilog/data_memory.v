@@ -1,24 +1,31 @@
-module data_memory (
-    input wire clk,                   // Clock para escrita
-    input wire MemWrite,             // Habilita escrita
-    input wire MemRead,              // Habilita leitura
-    input wire [31:0] address,       // Endereço da memória
-    input wire [31:0] write_data,    // Dado a ser escrito
-    output reg [31:0] read_data      // Dado lido
+// data_memory.v
+module data_memory #(
+    parameter DATA_WIDTH = 32,
+    parameter ADDR_WIDTH = 8  // Para 2^8 = 256 palavras
+)(
+    input clk,
+    input MemWrite, // Habilita a escrita
+    input MemRead,  // Habilita a leitura (opcional, mas bom para clareza)
+    input [ADDR_WIDTH-1:0] address,
+    input [DATA_WIDTH-1:0] write_data,
+    output reg [DATA_WIDTH-1:0] read_data
 );
 
-    reg [31:0] memory [0:255];       // Memória com 256 posições de 32 bits
+    // Declara a memória. Esta é a linha mais importante.
+    // O Quartus vai transformar isso em um bloco de RAM.
+    reg [DATA_WIDTH-1:0] ram_block [0:(1<<ADDR_WIDTH)-1];
 
     always @(posedge clk) begin
-        if (MemWrite)
-            memory[address[9:2]] <= write_data; // Escrita sincronizada
-    end
-
-    always @(*) begin
-        if (MemRead)
-            read_data = memory[address[9:2]];   // Leitura combinacional
-        else
-            read_data = 32'b0;
+        // Lógica de escrita síncrona
+        if (MemWrite) begin
+            ram_block[address] <= write_data;
+        end
+        
+        // Lógica de leitura síncrona
+        // O endereço é capturado na borda do clock, e o dado sai no próximo ciclo
+        if (MemRead) begin
+            read_data <= ram_block[address];
+        end
     end
 
 endmodule

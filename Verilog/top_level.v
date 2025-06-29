@@ -1,75 +1,98 @@
 module top(
 	input clk,
-	input rst,
-	input rst_rf,
-	input en,
-	input en_rf,
-	input selec_mux,
-	input selec_mux2,
+    input rst,
+    input en,
+
+    //Unidade de Controle
+	input Branch,
+	input RegDst,
+	input regWrite,
+	input alu_scr,
 	input [3:0 ] alu_op,
-	
+	input MemToReg,
+	input MemWrite,
+	input MemRead,
 	output [31:0] fim
     
 );
 
-wire [31:0] q;
-wire [31:0] d;
+wire [31:0] pc_current;
+wire [31:0] pc_plus_4;
+wire [31:0] soma4_result;
+wire [31:0] soma_result;
+wire [31:0] shiftleft;
 wire [4:0] rW_w;
-wire [4:0] rs_w;
-wire [4:0] rt_w;
-wire [4:0] rd_w;
+wire [4:0] instr_rs;
+wire [4:0] instr_rt;
+wire [4:0] instr_rd; 
 wire [15:0] immediate_w;
-wire [31:0] c_w;
+wire [31:0] alu_result;
 
 
 
-wire [31:0] rfb;
+wire [31:0] alu_input_b;
 
 wire [31:0] sin_ex_w;
+wire [31:0] r_data;
 
 
-wire [31:0] rd1_w;
-wire [31:0] rd2_w;
+wire [31:0] rdA_w;
+wire [31:0] rdB_w;
+wire [31:0] mux_mem;
 
 
 pc pc_inst(
     .clk(clk),
     .rst(rst),
-    .d(d),
+    .d(pc_plus_4),
     .en(en),
-    .q(q)
+    .q(pc_current)
+);
+//somadores
+somador som_inst(
+    .a(pc_current),
+  //.b(constante dentro do modulo)
+    .c(soma4_result)
+);
+somador_ab somAB_inst(
+	.a_in(soma4_result),
+	.b_in(shiftleft),
+	.c_out(soma_result)
 );
 
-somador som_inst(
-    .a(q),
-    .b(d)
-);
+//mux
+assign pc_plus_4 = Branch? soma_result: soma4_result;
 
 memoria_instrucao mi_inst(
-	.pc(q),
+	.pc(pc_current),
 	.instruction(),
 	.op(),
-	.rs(rs_w),
-	.rt(rt_w),
-	.rd(rd_w),
+	.rs(instr_rs),
+	.rt(instr_rt),
+	.rd(instr_rd),
 	.immediate(immediate_w)
 );
+//banco registrador
 register_file reg_file(
 	.clk(clk),
-	.rst(rst_rf),
-	.en(en_rf),
-	.rA(rs_w),
-	.rB(rt_w),
+	.rst(rst),
+	.en(regWrite),
+	.rA(instr_rs), 
+	.rB(instr_rt),
 	.rW(rW_w),
-	.Wd(c_w),
-	.rD1(rd1_w),
-	.rD2(rd2_w)
+	.Wd(mux_mem),
+	.rD1(rdA_w),
+	.rD2(rdB_w)
 );
+
+//mux
+assign rW_w = RegDst ? instr_rd : instr_rt;
+
 alu alu_inst(
-	.a(rd1_w),
-	.b(rfb),
+	.a(rdA_w),
+	.b(alu_input_b),
 	.op(alu_op),
-	.c(c_w)
+	.c(alu_result) 
 
 );
 sinal_ex sinal_ex_inst(
@@ -77,9 +100,29 @@ sinal_ex sinal_ex_inst(
 	.b(sin_ex_w)
 );
 
-assign rW_w = selec_mux ? rd_w : rs_w;
-assign rfb = selec_mux2 ? sin_ex_w: rd2_w;
-assign fim = c_w;
+//mux
+assign alu_input_b = alu_scr ? sin_ex_w: rdB_w;
+
+//mux 
+assign mux_mem = MemToReg? r_data: alu_result;
+
+shift_left_2 shift_left_inst(
+	.in(sin_ex_w),
+	.out(shiftleft)
+
+);
+//memoria de dados (memoria ram)
+data_memory data_mem_inst(
+	.clk(clk),
+	.MemWrite(MemWrite),
+	.MemRead(MemRead),
+	.address(alu_result),
+	.write_data(rdB_w),
+	.read_data(r_data)
+	
+
+);
+assign fim = alu_result;
 
 
 endmodule

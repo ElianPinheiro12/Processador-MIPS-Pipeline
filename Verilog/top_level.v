@@ -1,7 +1,7 @@
 module top(
 	input clk,
-    input rst,
-    input en,
+   input rst,
+   input en,
 
     //Unidade de Controle
 	input Branch,
@@ -21,15 +21,8 @@ wire [31:0] pc_plus_4;
 wire [31:0] soma4_result;
 wire [31:0] soma_result;
 wire [31:0] shiftleft;
-wire [4:0] rW_w;
-wire [4:0] instr_rs;
-wire [4:0] instr_rt;
-wire [4:0] instr_rd; 
-wire [15:0] immediate_w;
+wire [4:0] rW_w; 
 wire [31:0] alu_result;
-
-
-
 wire [31:0] alu_input_b;
 
 wire [31:0] sin_ex_w;
@@ -39,6 +32,17 @@ wire [31:0] r_data;
 wire [31:0] rdA_w;
 wire [31:0] rdB_w;
 wire [31:0] mux_mem;
+
+wire [31:0] instruction_w;
+
+//fios para instrucao:
+wire [5:0]  op_code_w;
+wire [4:0]  instr_rs;
+wire [4:0]  instr_rt;
+wire [4:0]  instr_rd;
+wire [4:0]  shamt_w;
+wire [5:0]  funct_w;
+wire [15:0] immediate_w;
 
 
 pc pc_inst(
@@ -65,13 +69,19 @@ assign pc_plus_4 = Branch? soma_result: soma4_result;
 
 memoria_instrucao mi_inst(
 	.pc(pc_current),
-	.instruction(),
-	.op(),
-	.rs(instr_rs),
-	.rt(instr_rt),
-	.rd(instr_rd),
-	.immediate(immediate_w)
+	.instruction(instruction_w)
 );
+
+assign op_code_w   = instruction_w[31:26];
+assign instr_rs    = instruction_w[25:21]; // Usado pelo banco de registradores e ALU
+assign instr_rt    = instruction_w[20:16]; // Usado pelo banco de registradores e mux
+assign instr_rd    = instruction_w[15:11]; // Usado pelo mux que escolhe o registrador de escrita
+assign funct_w     = instruction_w[5:0];   // Usado pela unidade de controle/ALU control
+assign immediate_w = instruction_w[15:0]; // Usado para operações imediatas
+
+
+
+
 //banco registrador
 register_file reg_file(
 	.clk(clk),
